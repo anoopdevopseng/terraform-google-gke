@@ -1,9 +1,20 @@
 variable "name" {
   type = string
+  description = "Base name for the cluster. Must not contain '-' or '_'"
+
+  validation {
+    condition     = !can(regex("[-_]", var.name))
+    error_message = "The 'name' must not contain hyphens (-) or underscores (_)."
+  }
 }
 
 variable "project_id" {
   type = string
+}
+
+variable "environment" {
+  type = string
+  description = "The environment name, e.g. dev, stage, or prod"
 }
 
 variable "location" {
@@ -52,6 +63,17 @@ variable "cluster_secondary_range_name" {
 
 variable "services_secondary_range_name" {
   type = string
+}
+
+variable "dns_allow_external_traffic" {
+  description = "(Optional) Controls whether external traffic is allowed over the dns endpoint."
+  type        = bool
+  default     = null
+}
+
+variable "allow_ip_traffic" {
+  type = bool
+  default = true
 }
 
 variable "deletion_protection" {

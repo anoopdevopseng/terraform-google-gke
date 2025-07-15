@@ -1,6 +1,6 @@
 ## Setup GKE 
 resource "google_container_cluster" "primary" {
-  name                     = var.name
+  name                     = local.name
   project                  = var.project_id
   location                 = var.location
   remove_default_node_pool = true
@@ -17,7 +17,7 @@ resource "google_container_cluster" "primary" {
   }
 
   dynamic "master_authorized_networks_config" {
-  for_each = var.enable_private_endpoint == true || length(var.authorized_networks) > 0 ? [true] : []
+  for_each = var.enable_private_endpoint == true || length(var.authorized_networks) > 0 || var.gcp_public_cidrs_access_enabled == true ? [true] : []
   content {
     gcp_public_cidrs_access_enabled = var.gcp_public_cidrs_access_enabled
 
@@ -48,6 +48,18 @@ resource "google_container_cluster" "primary" {
     services_secondary_range_name = var.services_secondary_range_name
   }
 
+  dynamic "control_plane_endpoints_config" {
+    for_each = var.dns_allow_external_traffic != null ? [1] : []
+    content {
+      dns_endpoint_config {
+        allow_external_traffic = var.dns_allow_external_traffic
+      }
+      ip_endpoints_config {
+        enabled = var.allow_ip_traffic
+      }
+    }
+  }
+  
   secret_manager_config {
     enabled = true
   }

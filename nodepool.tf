@@ -1,7 +1,7 @@
 resource "google_container_node_pool" "primary_nodes" {
   for_each = var.node_pools
 
-  name     = "${var.name}-${each.key}"
+  name     = "${local.name}-${each.key}"
   cluster  = google_container_cluster.primary.name
   location = var.location
   project  = var.project_id
@@ -14,7 +14,7 @@ resource "google_container_node_pool" "primary_nodes" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
-    tags = concat(["${var.name}-${each.key}"],each.value.tags )
+    tags = concat(["${local.name}-${each.key}"],each.value.tags )
   }
 
   autoscaling {

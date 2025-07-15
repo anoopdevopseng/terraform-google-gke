@@ -1,16 +1,30 @@
 # Module usage examples
 
+- **Naming Convention**  
+    Name variable must not contain hyphens (`-`) or underscores (`_`). This is enforced by validation in the Terraform module.
+
+- **Example of invalid values**  
+    `my-app`, `my_app`
+
+- **Example of valid values**  
+    `myapp`, `myApp`, `Myapp`, `MyApp ` 
+    The `name` variable is used to construct a unique cluster name in combination with the `environment` variable.
+
+- **Example of produced values**  
+    `myapp-cluster-dev`
+
 ## Minimal example
 
 This creates a private Cluster instance with minimal required inputs.
 ```hcl
 module "gke" {
-  source              = "github.com/anoopdevopseng/terraform-google-gke"
-  name                = "gke-test"
-  project_id          = "google-project-id"
-  location            = "europe-west3"
+  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke.git?ref=v0.1.0"
+  name                = "myapp"
+  project_id          = "my-project-id"
+  environment         = "dev"
+  location            = "europe-west3-a"
   vpc_name            = "default"
-  subnetwork          = "private"
+  subnetwork          = "private-subnet"
   cluster_secondary_range_name = "gke-pod-range"
   services_secondary_range_name = "gke-service-range"
   deletion_protection = false
@@ -28,16 +42,17 @@ output "endpoint" {
 }
 ```
 
-## Create multiple nodepools and enable authorized networks
+Create multiple nodepools and enable authorized networks
 
 ```hcl
 module "gke" {
-  source              = "github.com/anoopdevopseng/terraform-google-gke"
+  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke.git?ref=v0.1.0"
   name                = "gke-test"
-  project_id          = "google-project-id"
-  location            = "europe-west3"
+  project_id          = "my-project-id"
+  environment         = "dev"
+  location            = "europe-west3-a"
   vpc_name            = "default"
-  subnetwork          = "private"
+  subnetwork          = "private-subnet"
   cluster_secondary_range_name = "gke-pod-range"
   services_secondary_range_name = "gke-service-range"
   deletion_protection = false
