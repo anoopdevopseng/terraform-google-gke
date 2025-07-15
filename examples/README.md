@@ -18,7 +18,7 @@
 This creates a private Cluster instance with minimal required inputs.
 ```hcl
 module "gke" {
-  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke?ref=v0.1.0"
+  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke.git?ref=v0.1.0"
   name                = "myapp"
   project_id          = "my-project-id"
   environment         = "dev"
@@ -46,7 +46,7 @@ Create multiple nodepools and enable authorized networks
 
 ```hcl
 module "gke" {
-  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke?ref=v0.1.0"
+  source              = "git::https://github.com/anoopdevopseng/terraform-google-gke.git?ref=v0.1.0"
   name                = "gke-test"
   project_id          = "my-project-id"
   environment         = "dev"
