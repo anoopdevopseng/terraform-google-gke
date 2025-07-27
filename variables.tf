@@ -99,3 +99,9 @@ variable "authorized_networks" {
   }))
   default = []
 }
+
+variable "argocd" {
+  description = "Enable ArgoCD installation"
+  type        = bool
+  default     = false
+}

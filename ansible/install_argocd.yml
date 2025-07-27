@@ -1,0 +1,22 @@
+---
+- name: Install ArgoCD on GKE
+  hosts: localhost
+  vars:
+    kubeconfig: "/path/to/your/kubeconfig"
+    argocd_namespace: "argocd"
+  tasks:
+    - name: Create ArgoCD namespace
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ argocd_namespace }}"
+
+    - name: Install ArgoCD manifests
+      ansible.builtin.command:
+        cmd: kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+        env:
+          KUBECONFIG: "{{ kubeconfig }}"
