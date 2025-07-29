@@ -4,17 +4,27 @@
   vars:
     argocd_namespace: "argocd"
   tasks:
+    - name: Create kubeconfig directory if not exists
+      ansible.builtin.file:
+        path: "~/.kube"
+        state: directory
+        mode: '0755'
+
+    - name: Touch kubeconfig file (ensure it exists)
+      ansible.builtin.file:
+        path: "~/.kube/{{ kubeconfig }}"
+        state: touch
+        mode: '0600'
+
     - name: Fetch GKE cluster credentials using gcloud
       ansible.builtin.command: >
-        gcloud container clusters get-credentials {{ cluster_name }}
+        KUBECONFIG="~/.kube/{{ kubeconfig }}" gcloud container clusters get-credentials {{ cluster_name }}
         --region {{ region }} --project {{ project_id }}
-      environment:
-        KUBECONFIG: "{{ kubeconfig }}"
       changed_when: false
 
     - name: Create ArgoCD namespace
       kubernetes.core.k8s:
-        kubeconfig: "{{ kubeconfig }}"
+        kubeconfig: "~/.kube/{{ kubeconfig }}"
         state: present
         definition:
           apiVersion: v1
@@ -25,5 +35,5 @@
     - name: Install ArgoCD manifests
       ansible.builtin.command:
         cmd: kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-        env:
-          KUBECONFIG: "{{ kubeconfig }}"
+        environment:
+          KUBECONFIG: "~/.kube/{{ kubeconfig }}"
