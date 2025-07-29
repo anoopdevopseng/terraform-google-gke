@@ -2,7 +2,6 @@
 - name: Install ArgoCD on GKE
   hosts: localhost
   vars:
-    kubeconfig: "/path/to/your/kubeconfig"
     argocd_namespace: "argocd"
   tasks:
     - name: Fetch GKE cluster credentials using gcloud
@@ -12,7 +11,7 @@
       environment:
         KUBECONFIG: "{{ kubeconfig }}"
       changed_when: false
-      
+
     - name: Create ArgoCD namespace
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig }}"
