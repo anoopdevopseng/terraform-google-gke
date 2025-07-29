@@ -72,7 +72,7 @@ resource "null_resource" "argocd_install" {
   depends_on = [google_container_cluster.primary]
   provisioner "local-exec" {
     command = <<EOT
-      gcloud container clusters get-credentials ${local.name} --region ${var.location} --project ${var.project_id} --kubeconfig kubeconfig_${local.name}.yaml
+      cd ${path.module}
       if ! command -v ansible-playbook &> /dev/null; then
         echo "Ansible not found, attempting installation..."
         if command -v apt-get &> /dev/null; then
