@@ -5,6 +5,14 @@
     kubeconfig: "/path/to/your/kubeconfig"
     argocd_namespace: "argocd"
   tasks:
+    - name: Fetch GKE cluster credentials using gcloud
+      ansible.builtin.command: >
+        gcloud container clusters get-credentials {{ cluster_name }}
+        --region {{ region }} --project {{ project_id }}
+      environment:
+        KUBECONFIG: "{{ kubeconfig }}"
+      changed_when: false
+      
     - name: Create ArgoCD namespace
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig }}"

@@ -87,7 +87,7 @@ resource "null_resource" "argocd_install" {
         fi
       fi
       ansible-playbook ansible/install_tools.yml
-      ansible-playbook ansible/install_argocd.yml --extra-vars "kubeconfig=kubeconfig_${local.name}.yaml"
+      ansible-playbook ansible/install_argocd.yml --extra-vars "project_id=${var.project_id} region=${var.location} cluster_name=${local.name} kubeconfig=kubeconfig_${local.name}.yaml"
     EOT
   }
 }
