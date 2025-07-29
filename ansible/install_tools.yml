@@ -41,3 +41,28 @@
           Invoke-WebRequest -Uri "https://dl.k8s.io/release/$version/bin/windows/amd64/kubectl.exe" -OutFile "$env:ProgramFiles\kubectl.exe"
         }
       when: shell_name == 'powershell'
+
+    # Install python3-pip
+    - name: Ensure pip is installed (Debian)
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ensure pip is installed (RedHat)
+      ansible.builtin.yum:
+        name: python3-pip
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    # Install python 'kubernetes' module if not present
+    - name: Check if 'kubernetes' Python module is installed
+      ansible.builtin.command: python3 -c "import kubernetes"
+      register: kubernetes_check
+      ignore_errors: true
+
+    - name: Install kubernetes Python client if missing
+      ansible.builtin.pip:
+        name: kubernetes
+        executable: pip3
+      when: kubernetes_check.rc != 0
