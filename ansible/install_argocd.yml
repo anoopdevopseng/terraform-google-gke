@@ -18,7 +18,7 @@
         mode: '0600'
 
     - name: Fetch GKE cluster credentials using gcloud
-      ansible.builtin.command: >
+      ansible.builtin.shell: >
         gcloud container clusters get-credentials {{ cluster_name }}
         --region {{ region }} --project {{ project_id }}
       environment:
@@ -36,7 +36,7 @@
             name: "{{ argocd_namespace }}"
 
     - name: Install ArgoCD manifests
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
         environment:
           KUBECONFIG: "{{ kubeconfig_path }}"
