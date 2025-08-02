@@ -1,0 +1,68 @@
+---
+- name: Ensure required tools are installed
+  hosts: localhost
+  tasks:
+    - name: Detect shell type
+      ansible.builtin.shell: echo $SHELL
+      register: shell_type
+
+    - name: Set shell fact
+      set_fact:
+        shell_name: "{{ shell_type.stdout | basename }}"
+
+    - name: Install gcloud if not present (bash/zsh)
+      ansible.builtin.shell: |
+        if ! command -v gcloud &> /dev/null; then
+          curl -sSL https://sdk.cloud.google.com | bash
+        fi
+      when: shell_name in ['bash', 'zsh']
+
+    - name: Install gcloud if not present (powershell)
+      ansible.builtin.win_shell: |
+        if (-not (Get-Command gcloud -ErrorAction SilentlyContinue)) {
+          Invoke-WebRequest -Uri "https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCloudSDKInstaller.exe" -OutFile "$env:TEMP\GoogleCloudSDKInstaller.exe"
+          Start-Process "$env:TEMP\GoogleCloudSDKInstaller.exe" -Wait
+        }
+      when: shell_name == 'powershell'
+
+    - name: Install kubectl if not present (bash/zsh)
+      ansible.builtin.shell: |
+        if ! command -v kubectl &> /dev/null; then
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/
+        fi
+      when: shell_name in ['bash', 'zsh']
+
+    - name: Install kubectl if not present (powershell)
+      ansible.builtin.win_shell: |
+        if (-not (Get-Command kubectl -ErrorAction SilentlyContinue)) {
+          $version = Invoke-RestMethod -Uri "https://dl.k8s.io/release/stable.txt"
+          Invoke-WebRequest -Uri "https://dl.k8s.io/release/$version/bin/windows/amd64/kubectl.exe" -OutFile "$env:ProgramFiles\kubectl.exe"
+        }
+      when: shell_name == 'powershell'
+
+    # Install python3-pip
+    - name: Ensure pip is installed (Debian)
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ensure pip is installed (RedHat)
+      ansible.builtin.yum:
+        name: python3-pip
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    # Install python 'kubernetes' module if not present
+    - name: Check if 'kubernetes' Python module is installed
+      ansible.builtin.command: python3 -c "import kubernetes"
+      register: kubernetes_check
+      ignore_errors: true
+
+    - name: Install kubernetes Python client if missing
+      ansible.builtin.pip:
+        name: kubernetes
+        executable: pip3
+      when: kubernetes_check.rc != 0

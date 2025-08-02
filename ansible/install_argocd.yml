@@ -1,0 +1,42 @@
+---
+- name: Install ArgoCD on GKE
+  hosts: localhost
+  vars:
+    argocd_namespace: "argocd"
+    kubeconfig_path: "{{ ansible_env.HOME }}/.kube/{{ kubeconfig }}"
+  tasks:
+    - name: Create kubeconfig directory if not exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        mode: '0755'
+
+    - name: Touch kubeconfig file (ensure it exists)
+      ansible.builtin.file:
+        path: "{{ kubeconfig_path }}"
+        state: touch
+        mode: '0600'
+
+    - name: Fetch GKE cluster credentials using gcloud
+      ansible.builtin.shell: >
+        gcloud container clusters get-credentials {{ cluster_name }}
+        --region {{ region }} --project {{ project_id }}
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      changed_when: false
+
+    - name: Create ArgoCD namespace
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ argocd_namespace }}"
+
+    - name: Install ArgoCD manifests
+      ansible.builtin.shell: >
+        kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"

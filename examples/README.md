@@ -42,7 +42,7 @@ output "endpoint" {
 }
 ```
 
-Create multiple nodepools and enable authorized networks
+Create multiple nodepools and enable authorized networks and Install argocd
 
 ```hcl
 module "gke" {
@@ -53,6 +53,7 @@ module "gke" {
   location            = "europe-west3-a"
   vpc_name            = "default"
   subnetwork          = "private-subnet"
+  argocd              = true
   cluster_secondary_range_name = "gke-pod-range"
   services_secondary_range_name = "gke-service-range"
   deletion_protection = false

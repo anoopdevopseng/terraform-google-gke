@@ -67,3 +67,27 @@ resource "google_container_cluster" "primary" {
   deletion_protection = var.deletion_protection
 }
 
+resource "null_resource" "argocd_install" {
+  count = var.argocd ? 1 : 0
+  depends_on = [google_container_cluster.primary]
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ${path.module}
+      if ! command -v ansible-playbook &> /dev/null; then
+        echo "Ansible not found, attempting installation..."
+        if command -v apt-get &> /dev/null; then
+          sudo apt-get update && sudo apt-get install -y ansible
+        elif command -v yum &> /dev/null; then
+          sudo yum install -y ansible
+        elif command -v brew &> /dev/null; then
+          brew install ansible
+        else
+          echo "Automatic Ansible installation not supported on this OS."
+          exit 1
+        fi
+      fi
+      ansible-playbook ansible/install_tools.yml
+      ansible-playbook ansible/install_argocd.yml --extra-vars "project_id=${var.project_id} region=${var.location} cluster_name=${local.name} kubeconfig=kubeconfig_${local.name}.yaml"
+    EOT
+  }
+}
