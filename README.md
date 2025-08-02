@@ -17,6 +17,7 @@ Check out the [`examples`](/examples) directory for usage examples.
 | Name | Version |
 |------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | >= 6.27.0, < 7 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
@@ -30,12 +31,14 @@ No modules.
 | [google_container_node_pool.primary_nodes](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_node_pool) | resource |
 | [google_project_iam_member.cluster_sa_permission](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_service_account.cluster_service_account](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
+| [null_resource.argocd_install](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_allow_ip_traffic"></a> [allow\_ip\_traffic](#input\_allow\_ip\_traffic) | n/a | `bool` | `true` | no |
+| <a name="input_argocd"></a> [argocd](#input\_argocd) | Enable ArgoCD installation | `bool` | `false` | no |
 | <a name="input_authorized_networks"></a> [authorized\_networks](#input\_authorized\_networks) | n/a | <pre>list(object({<br/>    cidr_block = string<br/>    display_name = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_cluster_secondary_range_name"></a> [cluster\_secondary\_range\_name](#input\_cluster\_secondary\_range\_name) | n/a | `string` | n/a | yes |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | n/a | `bool` | `true` | no |
@@ -46,7 +49,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | n/a | `string` | `"europe-west3"` | no |
 | <a name="input_master_global_access_config"></a> [master\_global\_access\_config](#input\_master\_global\_access\_config) | n/a | `bool` | `false` | no |
 | <a name="input_max_pods_per_node"></a> [max\_pods\_per\_node](#input\_max\_pods\_per\_node) | n/a | `string` | `"30"` | no |
-| <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Base name for the cluster. Must not contain '-' or '\_' | `string` | n/a | yes |
 | <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | Map of node pool configurations | <pre>map(object({<br/>    min_node_count = number<br/>    max_node_count = number<br/>    machine_type   = optional(string, "e2-medium")<br/>    preemptible    = optional(bool, false)<br/>    tags           = optional(list(string),[])<br/>  }))</pre> | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
 | <a name="input_release_channel"></a> [release\_channel](#input\_release\_channel) | n/a | `string` | `"REGULAR"` | no |
