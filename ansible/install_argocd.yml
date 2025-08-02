@@ -36,7 +36,7 @@
             name: "{{ argocd_namespace }}"
 
     - name: Install ArgoCD manifests
-      ansible.builtin.shell:
-        cmd: kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-        environment:
-          KUBECONFIG: "{{ kubeconfig_path }}"
+      ansible.builtin.shell: >
+        kubectl apply -n {{ argocd_namespace }} -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
